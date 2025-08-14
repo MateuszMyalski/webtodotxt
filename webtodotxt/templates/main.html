@@ -14,7 +14,7 @@
 <div class="hello-message-container">
     <div class="left">
         <h3>Welcome {{ full_name }}!</h3>
-        <p>It's <b>{{ current_date }}</b>, and you have <b>{{ tasks_undone | length }}</b> unfinished tasks.</p>
+        <p>It's <b>{{ current_date }}</b>, and you have <b>{{ tasks_undone | length }}</b> unfinished tasks{% if tasks_undone | length == 0 %} 🎉{% endif %}.</p>
         {% if due_tasks > 0 %}
         <p><b>{{ due_tasks }} task{% if due_tasks > 1 %}s{% endif %} passed their deadilne!</b></p>
         {% endif %}
@@ -25,7 +25,7 @@
         </pre>
     </div>
 </div>
-<form method="POST" class="append-task-form" action="/task">
+<form method="POST" class="append-task-form" action="{{ url_for('main.internal_crud', _external=True) }}">
     {{ form.hidden_tag() }}
 
     {{ form.task.label }}

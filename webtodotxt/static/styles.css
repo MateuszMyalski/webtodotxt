@@ -66,6 +66,7 @@ form.append-task-form {
 
 }
 
+form.login-form,
 form.append-task-form label {
   margin-top: 10px;
   margin-bottom: 2px;
@@ -74,8 +75,20 @@ form.append-task-form label {
   text-transform: uppercase;
 }
 
+form.login-form > label.remember-me-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  margin-top: 10px;
+}
+
+form.login-form label:after,
 form.append-task-form label:after {
   content: ":";
+}
+
+form.login-form > label.remember-me-label:after {
+  content: none;
 }
 
 form.append-task-form > input[type="submit"]:hover {
@@ -102,7 +115,6 @@ form.config-form > input {
 
   font-size: 1em;
 }
-
 
 form.login-form > input[type="submit"],
 form.config-form > input[type="submit"] {

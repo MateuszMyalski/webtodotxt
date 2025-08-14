@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, request
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -96,5 +96,5 @@ def main_get():
         current_date=date.today(),
         calendar=calendar.month(date.today().year, date.today().month),
         full_name=requested_user.full_name,
-        due_tasks=_count_passed_due(undone),
+        due_tasks=_count_passed_due(undone)
     )

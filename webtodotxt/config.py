@@ -1,5 +1,5 @@
 import os
-
+from datetime import timedelta
 
 class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "unsafe-default-key")
@@ -25,3 +25,4 @@ class DevelopmentConfig(Config):
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_SAMESITE = None
     SESSION_COOKIE_DOMAIN = False
+    REMEMBER_COOKIE_DURATION = timedelta(days=30)
