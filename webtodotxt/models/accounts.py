@@ -123,64 +123,68 @@ class ConfigCreator(Config):
 class User(flask_login.UserMixin):
     TODO_FILE_NAME = "todo.txt"
     APP_DIRECTORY = "webtodotxt"
-
     def __init__(self, id, config: Config):
         self.id = id
-        self.config = config
-        self.user_directory = ""  # Set later in Users.load()
+        self._config = config
+        self._user_directory = ""
+        self._app_path = ""
+
+    def set_user_directory(self, directory):
+        self._user_directory = directory
+        self._app_path = os.path.join(self._user_directory, self.APP_DIRECTORY)
 
     @property
     def username(self):
-        return self.config.get_username()
+        return self._config.get_username()
 
     @property
     def full_name(self):
-        return self.config.get_full_name()
+        return self._config.get_full_name()
 
     def check_password(self, password: str) -> bool:
-        return self.config.check_password(password)
+        return self._config.check_password(password)
 
     def set_password(self, current: str, new: str) -> bool:
-        return self.config.change_password(current, new)
+        return self._config.change_password(current, new)
 
     def set_full_name(self, name: str):
-        self.config.set_full_name(name)
+        self._config.set_full_name(name)
 
     def get_id(self):
         return self.id
 
     def set_token(self):
-        return self.config.set_token()
+        return self._config.set_token()
 
     def get_token(self):
-        return self.config.get_token()
+        return self._config.get_token()
 
     def set_default_task(self, string):
-        self.config.set_default_task(string)
+        self._config.set_default_task(string)
 
     def get_default_task_constants(self):
         return {
             "date": date.today(),
-            "user": self.config.get_username(),
+            "user": self._config.get_username(),
             "name": self.full_name,
         }
 
     def get_default_task(self):
-        return self.config.get_default_task()
+        return self._config.get_default_task()
 
     def get_default_task_formated(self):
-        return self.config.get_default_task().format(
+        return self._config.get_default_task().format(
             **self.get_default_task_constants()
         )
 
     def set_show_last_n_done_tasks(self, n_tasks):
-        self.config.set_show_last_n_done_tasks(n_tasks)
+        self._config.set_show_last_n_done_tasks(n_tasks)
 
     def get_show_last_n_done_tasks(self):
-        return self.config.get_show_last_n_done_tasks()
+        return self._config.get_show_last_n_done_tasks()
 
     def get_todo_file(self) -> DbFile:
-        db_file = DbFile(os.path.join(self.user_directory, self.APP_DIRECTORY, self.TODO_FILE_NAME))
+        db_file = DbFile(os.path.join(self._app_path, self.TODO_FILE_NAME))
         if not db_file.exists():
             db_file.create()
         return db_file
@@ -210,7 +214,7 @@ class Users:
                     continue
 
                 self._users_db[user.id] = user
-                user.user_directory = os.path.join(db_path, entry.name)
+                user.set_user_directory(os.path.join(db_path, entry.name))
 
     def _load_user(self, db_file: DbFile) -> User | None:
         if not db_file.exists():
