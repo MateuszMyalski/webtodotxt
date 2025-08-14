@@ -1,0 +1,186 @@
+{% extends "index.html" %}
+
+
+{% block sub_nav %}
+<nav>
+    <span><a href="">by priority</a></span>
+    <span><a href="">by projects</a></span>
+    <span><a href="">by get_contexts()</a></span>
+</nav>
+{% endblock %}
+
+{% block content %}
+
+<div class="hello-message-container">
+    <div class="left">
+        <h3>Welcome {{ full_name }}!</h3>
+        <p>It's <b>{{ current_date }}</b>, and you have <b>{{ tasks_undone | length }}</b> unfinished tasks.</p>
+        {% if due_tasks > 0 %}
+        <p><b>{{ due_tasks }} task{% if due_tasks > 1 %}s{% endif %} passed their deadilne!</b></p>
+        {% endif %}
+    </div>
+    <div class="right">
+        <pre>
+{{ calendar }}
+        </pre>
+    </div>
+</div>
+<form method="POST" class="append-task-form" action="/task">
+    {{ form.hidden_tag() }}
+
+    {{ form.task.label }}
+    {{ form.task() }}
+    {{ form.submit() }}
+</form>
+
+<ol>
+    {% for task in tasks_undone %}
+    <li class="task" id="task-{{ task.get_line_nr() }}">
+
+        <input class="do" type="checkbox" onclick="toggleDone('{{ csrf_token() }}', {{ task.get_line_nr() }})">
+        <div class="details">
+            <div class="summary">
+                <span class="task-linenr">{{ task.get_line_nr() }}</span>
+                {% if task.priority %}
+                <span class="attr-value priority">{{ task.priority }}</span>
+                {% elif task.get_priority() %}
+                <span class="attr-value priority">{{ task.get_priority() }}</span>
+                {% endif %}
+                <span class="task-description">{{ task.get_bare_description() }}</span>
+            </div>
+            <div class="attrs">
+
+                {% if task.get_creation_date() %}
+                <span class="attr-name created">Created</span>
+                <span class="attr-value created">{{ task.get_creation_date() }}</span>
+                {% endif %}
+
+                {% if task.get_completion_date() %}
+                <span class="attr-name completion">Completed</span>
+                <span class="attr-value completion">{{ task.get_completion_date() }}</span>
+                {% endif %}
+
+
+                {% if task.get_due_date() %}
+                <span class="attr-name due">Due</span>
+                <span class="attr-value due {% if task.get_due_date() <= current_date %} passed {% endif %}">{{
+                    task.get_due_date() }}</span>
+                {% endif %}
+
+
+                {% if task.get_contexts() %}
+                <span class="attr-name context">Contexts</span>
+                {% for context in task.get_contexts() %}
+                <span class="attr-value context">@{{ context }}</span>
+                {% endfor %}
+                {% endif %}
+
+                {% if task.get_projects() %}
+                <span class="attr-name project">Projects</span>
+                {% for project in task.get_projects() %}
+                <span class="attr-value project">+{{ project }}</span>
+                {% endfor %}
+                {% endif %}
+
+                {% if task.get_attributes() | length > 0 %}
+                {% for attr_name, attr_values in task.get_attributes().items() %}
+                <span class="attr-name {{ attr_name }}">{{ attr_name }}</span>
+                {% for attr_value in attr_values %}
+                <span class="attr-value {{ attr_value }}">{{ attr_value }}</span>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <a href="#" onclick="openEdit('{{ csrf_token() }}', {{ task.get_line_nr() }}); return false;">Edit</a>
+                |
+                <a href="#"
+                    onclick="deleteLine('{{ csrf_token() }}', {{ task.get_line_nr() }}); return false;">Delete</a>
+            </div>
+        </div>
+
+    </li>
+    {% endfor %}
+</ol>
+{% if tasks_done | length %}
+<hr class="done-undone-sep">
+{% endif %}
+<ol>
+    {% for task in tasks_done %}
+    <li class="task done" id="task-{{ task.get_line_nr() }}">
+
+        <input class="do" type="checkbox" checked onclick="toggleDone('{{ csrf_token() }}', {{ task.get_line_nr() }})">
+        <div class="details">
+            <div class="summary">
+                <span class="task-linenr">{{ task.get_line_nr() }}</span>
+                {% if task.priority %}
+                <span class="attr-value priority">{{ task.priority }}</span>
+                {% elif task.get_priority() %}
+                <span class="attr-value priority">{{ task.get_priority()[0] }}</span>
+                {% endif %}
+                <span class="task-description">{{ task.get_bare_description() }}</span>
+            </div>
+            <div class="attrs">
+
+                {% if task.get_creation_date() %}
+                <span class="attr-name created">Created</span>
+                <span class="attr-value created">{{ task.get_creation_date() }}</span>
+                {% endif %}
+
+                {% if task.get_completion_date() %}
+                <span class="attr-name completion">Completed</span>
+                <span class="attr-value completion">{{ task.get_completion_date() }}</span>
+                {% endif %}
+
+                {% if task.get_contexts() %}
+                <span class="attr-name context">Contexts</span>
+                {% for context in task.get_contexts() %}
+                <span class="attr-value context">@{{ context }}</span>
+                {% endfor %}
+                {% endif %}
+
+                {% if task.get_projects() %}
+                <span class="attr-name project">Projects</span>
+                {% for project in task.get_projects() %}
+                <span class="attr-value project">+{{ project }}</span>
+                {% endfor %}
+                {% endif %}
+
+
+                {% if task.get_attributes() | length > 0 %}
+                {% for attr_name, attr_values in task.get_attributes().items() %}
+                <span class="attr-name {{ attr_name }}">{{ attr_name }}</span>
+                {% for attr_value in attr_values %}
+                <span class="attr-value {{ attr_value }}">{{ attr_value }}</span>
+                {% endfor %}
+                {% endfor %}
+                {% endif %}
+            </div>
+
+            <div class="actions">
+                <a href="#" onclick="openEdit('{{ csrf_token() }}', {{ task.get_line_nr() }}); return false;">Edit</a>
+                |
+                <a href="#"
+                    onclick="deleteLine('{{ csrf_token() }}', {{ task.get_line_nr() }}); return false;">Delete</a>
+            </div>
+        </div>
+
+    </li>
+    {% endfor %}
+
+</ol>
+
+<script src="{{ url_for('static', filename='crud.js') }}"></script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const scrollY = localStorage.getItem("scrollY");
+        if (scrollY !== null) {
+            window.scrollTo(0, parseInt(scrollY, 10));
+            localStorage.removeItem("scrollY");
+        }
+    });
+</script>
+
+{% endblock %}

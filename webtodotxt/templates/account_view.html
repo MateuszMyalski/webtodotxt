@@ -1,0 +1,122 @@
+{% extends "index.html" %}
+{% block content %}
+<main>
+    <h1 class="page-title">Profile settings</h1>
+
+    <div class="config-segment">
+        <h2>Account <i>{{ username }}</i> details</h2>
+        <form method="POST" class="config-form">
+            {{ form_details.hidden_tag() }}
+
+            {{ form_details.full_name.label }}
+            {{ form_details.full_name() }}
+
+            {{ form_details.submit() }}
+        </form>
+    </div>
+
+    <div class="config-segment">
+        <h2>Change password</h2>
+        <form method="POST" class="config-form">
+            {{ form_change_password.hidden_tag() }}
+
+            {{ form_change_password.current_passw.label }}
+            {{ form_change_password.current_passw() }}
+
+            {{ form_change_password.new_passw.label }}
+            {{ form_change_password.new_passw() }}
+
+            {{ form_change_password.confirm.label }}
+            {{ form_change_password.confirm() }}
+
+
+            {{ form_change_password.submit() }}
+        </form>
+    </div>
+
+
+    <div class="config-segment">
+        <h2>API token</h2>
+        <p>Once you generate your token, it lasts a lifetime. The only way to change it is by manually regenerating a
+            new one. Just a heads up: after it's created and shown to you, it won’t come back up again. So, make sure
+            you copy it and save it somewhere safe!</p>
+        <form method="POST" class="config-form">
+            {{ form_api_token.hidden_tag() }}
+
+            {{ form_api_token.token.label }}
+            {{ form_api_token.token() }}
+            {{ form_api_token.submit() }}
+        </form>
+
+        <details name="api-details">
+            <summary>Append todo - example request</summary>
+            <pre>
+            </pre>
+        </details>
+    </div>
+
+    <div class="config-segment">
+        <h2>App settings</h2>
+        <form method="POST" class="config-form">
+            {{ form_app_settings.hidden_tag() }}
+
+            {{ form_app_settings.default_task.label }}
+            {{ form_app_settings.default_task() }}
+
+            {{ form_app_settings.show_n_last_done_tasks.label }}
+            <div style="font-size: 0.8em;">{{ form_app_settings.show_n_last_done_tasks.description }}</div>
+            {{ form_app_settings.show_n_last_done_tasks() }}
+
+            {{ form_app_settings.submit() }}
+        </form>
+
+    </div>
+
+    <div class="config-segment">
+        <h2>Archive</h2>
+        <form method="POST" class="config-form">
+            {{ form_archive.hidden_tag() }}
+            {{ form_archive.submit() }}
+        </form>
+    </div>
+    <div class="config-segment">
+
+        <div class="config-manual">
+            <h2>How does it works?</h2>
+            <p><u><b>Priority (A)</b></u><br>
+                A capital letter in parentheses at the start of the line means priority.<br>
+                (A) is highest, (B) next, etc. Lowercase letters aren’t valid.</p>
+
+            <p><u><b>Completion marker: x 2025-08-13 2025-08-10</b></u><br>
+                'x' at the very beginning means the task is done.<br>
+                First date = completion date.<br>
+                Second date (optional) = creation date.</p>
+
+            <p><u><b>Projects: +Family, +Bills, +Reading</b></u><br>
+                Words starting with '+' are projects — larger goals or categories.</p>
+
+            <p><u><b>Contexts: @Phone, @Home, @Library, @Grocery</b></u><br>
+                Words starting with '@' are contexts — where, how, or with what resources.</p>
+
+            <p><u><b>Attributes: due:2025-08-20, rec:1w</b></u><br>
+                Key:value metadata extensions.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>due:</b> due date in YYYY-MM-DD.<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;<b>rec:</b> recurrence interval<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1w = every week,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;2d = every two days,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1m = every month,<br>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1y = every year<br>
+            </p>
+
+            <p><u><b>Examples:</b></u><br>
+                (A) Call mom +Family @Phone due:2025-08-20 rec:1w<br>
+                x 2025-08-13 2025-08-10 Pay electricity bill +Bills @Home<br>
+                Read "Dune" +Reading @Library due:2025-09-01<br>
+                Buy milk @Grocery
+            </p>
+        </div>
+    </div>
+
+</main>
+
+{% endblock %}
