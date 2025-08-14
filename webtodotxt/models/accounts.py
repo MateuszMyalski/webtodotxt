@@ -16,10 +16,6 @@ class Config:
         self._db_file = db_file
         self._data = self._load()
 
-        if self._data.get("webtodotxt", None) is None:
-            self._data["webtodotxt"] = {"api_token": "", "show_last_n_done_tasks": -1}
-            self._save()
-
     def _load(self) -> dict:
         if not self._db_file.exists():
             raise FileNotFoundError(f"Missing config: {self._db_file.get_path()}")
@@ -55,10 +51,21 @@ class Config:
 
         return True
 
+
+class WebTodoTxtConfig(Config):
+    def __init__(self, db_file: DbFile) -> None:
+        super().__init__(db_file)
+        if self._data.get("webtodotxt", None) is None:
+            self._data["webtodotxt"] = {
+                "api_token": "",
+                "show_last_n_done_tasks": -1,
+                "default_task": "",
+            }
+            self._save()
+
     def set_token(self):
         self._data["webtodotxt"]["api_token"] = secrets.token_urlsafe(32)
         self._save()
-
         return self.get_token()
 
     def get_token(self):
@@ -123,7 +130,8 @@ class ConfigCreator(Config):
 class User(flask_login.UserMixin):
     TODO_FILE_NAME = "todo.txt"
     APP_DIRECTORY = "webtodotxt"
-    def __init__(self, id, config: Config):
+
+    def __init__(self, id, config: WebTodoTxtConfig):
         self.id = id
         self._config = config
         self._user_directory = ""
@@ -220,7 +228,7 @@ class Users:
         if not db_file.exists():
             return None
 
-        config = Config(db_file)
+        config = WebTodoTxtConfig(db_file)
         user = User(id=config.get_username(), config=config)
 
         return user
