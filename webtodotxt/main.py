@@ -8,7 +8,7 @@ from wtforms import (
 )
 from .auth import auth_display_login_form
 from .extensions import users_db
-from .models.accounts import User
+from .models.accounts import AppUser
 from datetime import date
 import calendar
 
@@ -68,7 +68,7 @@ def main_get():
     if not current_user.is_authenticated:
         return auth_display_login_form()
 
-    requested_user: User | None = users_db.get(current_user.id)
+    requested_user: AppUser | None = users_db.get(current_user.id)
 
     if requested_user is None:
         return render_template("error.html", message="User not found.")
