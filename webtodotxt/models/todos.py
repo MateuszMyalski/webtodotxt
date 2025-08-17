@@ -82,7 +82,10 @@ class TaskWrapper:
         if not self._is_due():
             return None
 
-        return datetime.strptime(self._task.attributes.get("due")[0], "%Y-%m-%d").date()
+        try:
+            return Task.parse_date(self._task.attributes.get("due")[0])
+        except ValueError:
+            return None
 
     def parse(self, line):
         self._task.parse(line)
@@ -107,10 +110,10 @@ class TaskWrapper:
             due = self._task.attributes.get("due")[0]
             new_task.remove_attribute("due")
 
-            offset = datetime.strptime(due, "%Y-%m-%d").date()
+            offset = Task.parse_date(due)
 
         new_due = self._apply_recurring(offset, rec_dt[0])
-        while datetime.strptime(new_due, "%Y-%m-%d").date() < date.today():
+        while Task.parse_date(new_due) < date.today():
             new_due = self._apply_recurring(new_due, rec_dt[0])
 
         new_task.add_attribute("due", new_due)
@@ -120,7 +123,7 @@ class TaskWrapper:
 
     def _apply_recurring(self, dt: str | date, rec: str):
         if isinstance(dt, str):
-            dt = datetime.strptime(dt, "%Y-%m-%d")
+            dt = Task.parse_date(dt)
 
         num, unit = int(rec[:-1]), rec[-1]
         if unit == "d":
@@ -134,7 +137,7 @@ class TaskWrapper:
         else:
             raise ValueError("Unknown recurrence unit")
 
-        return dt.strftime("%Y-%m-%d")
+        return dt
 
     def edit_line(self, new_value):
         self._task.parse(new_value)
