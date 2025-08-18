@@ -1,5 +1,10 @@
 const API_BASE = "/task"; // change to your actual endpoint
 
+function showErrorDialog(message) {
+    alert(message);
+    location.reload();
+}
+
 async function getLine(csfr, lineNumber) {
     const response = await fetch(`${API_BASE}/${lineNumber}`, {
         method: "GET",
@@ -8,7 +13,10 @@ async function getLine(csfr, lineNumber) {
             'X-CSRF-TOKEN': csfr
         }
     });
-    if (!response.ok) throw new Error(`GET failed: ${response.status}`);
+    if (!response.ok) {
+        showErrorDialog(`GET failed: ${response.status}`);
+        throw new Error(`GET failed: ${response.status}`);
+    }
     return response.json();
 }
 
@@ -22,7 +30,10 @@ async function putLine(csfr, lineNumber, data) {
         body: JSON.stringify(data)
     });
 
-    if (!response.ok) throw new Error(`PUT failed: ${response.status}`);
+    if (!response.ok) {
+        showErrorDialog(`PUT failed: ${response.status}`);
+        throw new Error(`PUT failed: ${response.status}`);
+    }
 
     return response.json();
 }
@@ -34,7 +45,6 @@ async function toggleDone(csfr, lineNumber) {
 
     location.reload();
 }
-
 
 async function openEdit(csfr, lineNumber) {
     const li = document.getElementById(`task-${lineNumber}`);
@@ -84,7 +94,10 @@ async function postLine(csfr, lineNumber, data) {
         },
         body: JSON.stringify(data)
     });
-    if (!response.ok) throw new Error(`POST failed: ${response.status}`);
+    if (!response.ok) {
+        showErrorDialog(`POST failed: ${response.status}`);
+        throw new Error(`POST failed: ${response.status}`);
+    }
     return response.json();
 }
 
@@ -98,7 +111,10 @@ async function deleteLine(csfr, lineNumber) {
             'X-CSRF-TOKEN': csfr
         }
     });
-    if (!response.ok) throw new Error(`DELETE failed: ${response.status}`);
+    if (!response.ok) {
+        showErrorDialog(`DELETE failed: ${response.status}`);
+        throw new Error(`DELETE failed: ${response.status}`);
+    }
 
     location.reload();
 

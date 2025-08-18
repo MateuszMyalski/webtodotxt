@@ -64,7 +64,7 @@ def index() -> str | Response:
 
 
 @bp.route("/task/", defaults={"line_number": None}, methods=("POST",))
-@bp.route("/task/<line_number>", methods=("POST", "DELETE", "GET", "PUT"))
+@bp.route("/task/<int:line_number>", methods=("POST", "DELETE", "GET", "PUT"))
 @handle_uncaught_exceptions
 @login_required
 def internal_crud(line_number):

@@ -102,18 +102,18 @@ class TaskWrapper:
 
     def _create_reccuring_task(self):
         rec_dt = self._task.attributes.get("rec")
-
         new_task = Task(self._task._raw)
 
         offset = date.today()
+
         if self._is_due():
             due = self._task.attributes.get("due")[0]
             new_task.remove_attribute("due")
-
             offset = Task.parse_date(due)
 
         new_due = self._apply_recurring(offset, rec_dt[0])
-        while Task.parse_date(new_due) < date.today():
+
+        while new_due < date.today():
             new_due = self._apply_recurring(new_due, rec_dt[0])
 
         new_task.add_attribute("due", new_due)
@@ -121,10 +121,7 @@ class TaskWrapper:
 
         return new_task
 
-    def _apply_recurring(self, dt: str | date, rec: str):
-        if isinstance(dt, str):
-            dt = Task.parse_date(dt)
-
+    def _apply_recurring(self, dt: date, rec: str) -> date:
         num, unit = int(rec[:-1]), rec[-1]
         if unit == "d":
             dt += timedelta(days=num)
