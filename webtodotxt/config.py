@@ -6,6 +6,7 @@ class Config:
     ACCOUNTS_DB_DIRECTORY_PATH = os.environ.get(
         "ACCOUNTS_DB_DIRECTORY_PATH", "accounts"
     )
+    REMEMBER_COOKIE_DURATION = timedelta(days=30)
 
 
 class ProductionHTTPConfig(Config):
@@ -25,4 +26,3 @@ class DevelopmentConfig(Config):
     SESSION_COOKIE_SECURE = False
     SESSION_COOKIE_SAMESITE = None
     SESSION_COOKIE_DOMAIN = False
-    REMEMBER_COOKIE_DURATION = timedelta(days=30)
