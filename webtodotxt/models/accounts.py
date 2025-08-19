@@ -1,6 +1,5 @@
 import os
 import secrets
-import tomli_w
 from .file import DbFile
 from .user import Config, User
 from .todos import Todos
@@ -16,6 +15,7 @@ class WebTodoTxtConfig(Config):
                 "api_token": "",
                 "show_last_n_done_tasks": -1,
                 "default_task": "",
+                "quick_filters": {},
             }
             self._save()
 
@@ -27,21 +27,32 @@ class WebTodoTxtConfig(Config):
         return self.get_token()
 
     def get_token(self):
-        return self._data["webtodotxt"].get("api_token", None)
+        return self._app_config.get("api_token", None)
 
     def set_default_task(self, string):
         self._app_config["default_task"] = string
         self._save()
 
     def get_default_task(self):
-        return self._data["webtodotxt"].get("default_task", "")
+        return self._app_config.get("default_task", "")
 
     def set_show_last_n_done_tasks(self, n_tasks):
         self._app_config["show_last_n_done_tasks"] = n_tasks
         self._save()
 
     def get_show_last_n_done_tasks(self):
-        return self._data["webtodotxt"].get("show_last_n_done_tasks", -1)
+        return self._app_config.get("show_last_n_done_tasks", -1)
+
+    def get_quick_filters(self):
+        return self._app_config.get("quick_filters", {})
+
+    def set_quick_filters(self, new_quick_filters: dict):
+        quick_filters = self._app_config.get("quick_filters", None)
+        if quick_filters is None:
+            self._app_config.update({"quick_filters": {}})
+
+        self._app_config["quick_filters"] = new_quick_filters
+        self._save()
 
 
 class AppUser(User):
@@ -93,6 +104,12 @@ class AppUser(User):
         db_file = self.get_todo_file()
 
         return Todos(db_file)
+
+    def get_quick_filters(self):
+        return self._config.get_quick_filters()
+
+    def set_quick_filters(self, quick_filters):
+        self._config.set_quick_filters(quick_filters)
 
 
 class Users:

@@ -63,9 +63,9 @@ form.append-task-form {
 
   padding-bottom: 1em;
   border-bottom: 1px solid var(--light-gray-color);
-
 }
 
+form.search-form,
 form.login-form,
 form.append-task-form label {
   margin-top: 10px;
@@ -82,6 +82,8 @@ form.login-form > label.remember-me-label {
   margin-top: 10px;
 }
 
+form.quick-filter label:after,
+form.search-form label:after,
 form.login-form label:after,
 form.append-task-form label:after {
   content: ":";
@@ -95,13 +97,19 @@ form.append-task-form > input[type="submit"]:hover {
   filter: invert(2.0);
 }
 
+form.search-form,
 form.login-form,
 form.config-form {
   width: 50%;
 }
 
-form.login-form > input,
-form.config-form > input {
+form.search-form {
+  margin: 0 auto;
+}
+
+form.search-form input,
+form.login-form input,
+form.config-form input {
   background-color: var(--bg-color);
 
   padding: 5px;
@@ -116,8 +124,13 @@ form.config-form > input {
   font-size: 1em;
 }
 
-form.login-form > input[type="submit"],
-form.config-form > input[type="submit"] {
+form.search-form input {
+  font-size: 1.4em;
+}
+
+form.search-form input[type="submit"],
+form.login-form input[type="submit"],
+form.config-form input[type="submit"] {
   background-color: var(--bg-color);
   
   width: 100%;
@@ -137,11 +150,11 @@ form.config-form > input[type="submit"] {
   box-sizing: border-box;
 }
 
-form.login-form > input[type="submit"]:hover,
-form.config-form > input[type="submit"]:hover {
+form.search-form input[type="submit"]:hover,
+form.login-form input[type="submit"]:hover,
+form.config-form input[type="submit"]:hover {
   filter: invert(2.0);
 }
-
 
 form.append-task-form input[type="submit"] {
   background-color: var(--bg-color);
@@ -166,6 +179,10 @@ form.append-task-form textarea {
   box-sizing: border-box;
   font-size: 1em;
   min-height: 2em;
+}
+
+form.quick-filter table {
+  width: 100%;
 }
 
 ol {

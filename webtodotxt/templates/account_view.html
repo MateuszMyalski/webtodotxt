@@ -85,8 +85,21 @@ Content-type: application/json
             {{ form_archive.submit() }}
         </form>
     </div>
-    <div class="config-segment">
 
+    <div class="config-segment">
+        <h2>Quick filters</h2>
+        <form method="POST" class="config-form quick-filter">
+            {{ form_quick_filters.hidden_tag() }}
+            {% for f in form_quick_filters.filters %}
+                <b>Quick filter {{ loop.index }}</b>
+                {{ f }}
+                <br>
+            {% endfor %}
+            {{ form_quick_filters.submit() }}
+        </form>
+    </div>
+
+    <div class="config-segment">
         <div class="config-manual">
             <h2>How does it works?</h2>
             <p><u><b>Priority (A)</b></u><br>

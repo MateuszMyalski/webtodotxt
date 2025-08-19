@@ -6,9 +6,7 @@
 <nav>
   <span><a href="{{ url_for('main.account') }}">~{{ current_user.username }}</a></span>
   <span><a href="{{ url_for('main.index') }}">List</a></span>
+  <span><a href="{{ url_for('main.search') }}">Search</a></span>
   <span><a href="{{ url_for('main.logout') }}">Logout</a></span>
 </nav>
-
-{% block sub_nav %}
-{% endblock %}
 {% endif %}

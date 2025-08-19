@@ -64,6 +64,40 @@ def _sort_by_completion_date(tasks):
     return sorted(tasks, key=_sort_funct)
 
 
+def _get_filters():
+    raw_filter = request.args.get("filter", "")
+
+    tokens = [t.strip() for t in raw_filter.replace(",", " ").split() if t.strip()]
+
+    projects: list[str] = [t[1:] for t in tokens if t.startswith("+")]
+    contexts = [t[1:] for t in tokens if t.startswith("@")]
+    return (projects, contexts)
+
+
+def _apply_filters(tasks):
+    projects, contexts = _get_filters()
+
+    if not any([len(projects), len(contexts)]):
+        return tasks
+
+
+    filtered = []
+    for task in tasks:
+        task_projects = (
+            set() if task.get_projects() is None else set(task.get_projects())
+        )
+        task_contexts = (
+            set() if task.get_contexts() is None else set(task.get_contexts())
+        )
+
+        if all(elem in task_projects for elem in projects) and all(
+            elem in task_contexts for elem in contexts
+        ):
+            filtered.append(task)
+
+    return filtered
+
+
 def main_get():
     if not current_user.is_authenticated:
         return auth_display_login_form()
@@ -75,7 +109,9 @@ def main_get():
 
     todos = requested_user.get_todos()
 
-    done, undone = _sort_by_done(todos.get_tasks())
+    tasks = _apply_filters(todos.get_tasks())
+
+    done, undone = _sort_by_done(tasks)
 
     undone = _sort_by_prio_and_date(undone)
     done = _sort_by_completion_date(done)
@@ -96,5 +132,6 @@ def main_get():
         current_date=date.today(),
         calendar=calendar.month(date.today().year, date.today().month),
         full_name=requested_user.full_name,
-        due_tasks=_count_passed_due(undone)
+        quick_filters=requested_user.get_quick_filters(),
+        due_tasks=_count_passed_due(undone),
     )

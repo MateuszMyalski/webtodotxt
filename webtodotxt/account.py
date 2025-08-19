@@ -2,13 +2,40 @@ from datetime import datetime
 from flask import render_template, flash, get_flashed_messages, request
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, IntegerField
+from wtforms import (
+    StringField,
+    PasswordField,
+    SubmitField,
+    IntegerField,
+    FieldList,
+    FormField,
+)
 from wtforms import validators
 from .models.accounts import AppUser
 from .models.flash import FlashType, flash_collect
 from .models.file import DbFile
 from .extensions import users_db
 from .token import generate_user_token
+
+
+class FilterForm(FlaskForm):
+    name = StringField("Name")
+    value = StringField("Value")
+
+
+class QuickFiltersForm(FlaskForm):
+    filters = FieldList(FormField(FilterForm), min_entries=5, max_entries=5)
+    submit = SubmitField("Save")
+
+    def populate_default_filters(self, quick_filters: dict):
+        for idx, (filter_name, filter_val) in enumerate(quick_filters.items()):
+            if idx >= len(self.filters):
+                break
+
+            self.filters[idx].form.name.data = filter_name
+            self.filters[idx].form.name.default = filter_name
+            self.filters[idx].form.value.data = filter_val
+            self.filters[idx].form.value.default = filter_val
 
 
 class UserDetailsForm(FlaskForm):
@@ -144,6 +171,22 @@ def _handle_archive_handle(user: AppUser, form: ArchiveForm) -> None:
     flash("Archived.", FlashType.INFO.name)
 
 
+def _handle_quick_filters_handle(user: AppUser, form: QuickFiltersForm):
+    if not form.validate_on_submit():
+        flash("Request could not be validated.", FlashType.ERROR.name)
+        return
+
+    quick_filters = {}
+    for filter_form in form.filters:
+        name = filter_form.form.name.data.strip()
+        value = filter_form.form.value.data.strip()
+        if name and value:
+            quick_filters[name] = value
+
+    user.set_quick_filters(quick_filters)
+    flash("Quick filters updated.", FlashType.INFO.name)
+
+
 def account_post():
     requested_user: AppUser | None = users_db.get(current_user.id)
 
@@ -155,6 +198,7 @@ def account_post():
     form_api_token = XApiKeyGenerateForm(prefix="token")
     form_app_settings = AppSettingsForm(prefix="app")
     form_archive = ArchiveForm(prefix="archive")
+    form_quick_filters = QuickFiltersForm(prefix="filters")
 
     if form_details.submit.data:
         _handle_details_change(requested_user, form_details)
@@ -171,6 +215,9 @@ def account_post():
     if form_archive.submit.data:
         _handle_archive_handle(requested_user, form_archive)
 
+    if form_quick_filters.submit.data:
+        _handle_quick_filters_handle(requested_user, form_quick_filters)
+
     form_details.populate_default_full_name(requested_user.full_name)
 
     return render_template(
@@ -182,6 +229,7 @@ def account_post():
         host_url=request.host_url,
         form_app_settings=form_app_settings,
         form_archive=form_archive,
+        form_quick_filters=form_quick_filters,
         infos=flash_collect(),
     )
 
@@ -207,6 +255,9 @@ def account_get():
 
     form_archive = ArchiveForm(prefix="archive")
 
+    form_quick_filters = QuickFiltersForm(prefix="filters")
+    form_quick_filters.populate_default_filters(requested_user.get_quick_filters())
+
     return render_template(
         "account_view.html",
         form_details=form_details,
@@ -216,5 +267,6 @@ def account_get():
         host_url=request.host_url,
         form_app_settings=form_app_settings,
         form_archive=form_archive,
+        form_quick_filters=form_quick_filters,
         infos=flash_collect(),
     )

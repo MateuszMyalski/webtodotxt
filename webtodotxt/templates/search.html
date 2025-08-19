@@ -1,0 +1,19 @@
+{% extends "index.html" %}
+
+{% block content %}
+
+<form method="POST" class="search-form">
+    {{ form.hidden_tag() }}
+    {{ form.search_box.label }}{{ form.search_box() }}
+    {{ form.submit() }}
+</form>
+
+<div class="search-instructions" style="margin-top: 2em;">
+    <p>
+        <strong>Tip:</strong> Enter project and context names to filter your tasks.<br>
+        <span style="color: #666;">Example: <code>+project1, @context1, @context2</code></span>
+    </p>
+</div>
+
+
+{% endblock %}

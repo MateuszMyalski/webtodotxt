@@ -19,8 +19,12 @@
 <body>
     <header>
         {% include "header.html" %}
+        {% if current_user.is_authenticated %}
+        {% block filters %}{% endblock %}
+        {% endif %}
     </header>
     {% include "infos_block.html" %}
+
     <main>
     {% block content %}
     {% endblock %}

@@ -8,7 +8,7 @@ from .account import account_post, account_get
 from .main import main_get
 from .token import verify_user_token
 from .crud import crud_form_post, crud_delete, crud_get, crud_put, crud_api_post
-
+from .search import search_post, search_get
 
 def handle_uncaught_exceptions(f):
     @wraps(f)
@@ -102,5 +102,17 @@ def account():
 
     if request.method == "GET":
         return account_get()
+
+    return render_template("404.html")
+
+@bp.route("/search", methods=("GET", "POST"))
+@handle_uncaught_exceptions
+@login_required
+def search():
+    if request.method == "POST":
+        return search_post()
+
+    if request.method == "GET":
+        return search_get()
 
     return render_template("404.html")

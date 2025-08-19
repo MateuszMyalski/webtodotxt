@@ -1,20 +1,20 @@
 {% extends "index.html" %}
 
-
-{% block sub_nav %}
+{% block filters %}
 <nav>
-    <span><a href="">by priority</a></span>
-    <span><a href="">by projects</a></span>
-    <span><a href="">by get_contexts()</a></span>
+    {% for name, filter_param in quick_filters.items() %}
+    <span><a href="{{ url_for('main.index', _external=True, filter=filter_param) }}">{{ name }}</a></span>
+    {% endfor %}
 </nav>
+
 {% endblock %}
 
 {% block content %}
-
 <div class="hello-message-container">
     <div class="left">
         <h3>Welcome {{ full_name }}!</h3>
-        <p>It's <b>{{ current_date }}</b>, and you have <b>{{ tasks_undone | length }}</b> unfinished tasks{% if tasks_undone | length == 0 %} 🎉{% endif %}.</p>
+        <p>It's <b>{{ current_date }}</b>, and you have <b>{{ tasks_undone | length }}</b> unfinished tasks{% if
+            tasks_undone | length == 0 %} 🎉{% endif %}.</p>
         {% if due_tasks > 0 %}
         <p><b>{{ due_tasks }} task{% if due_tasks > 1 %}s{% endif %} passed their deadilne!</b></p>
         {% endif %}
